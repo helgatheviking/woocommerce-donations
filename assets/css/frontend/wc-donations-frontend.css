@@ -1,0 +1,13 @@
+.donation_form .donation-amounts {
+  list-style: none;
+}
+.donation_form .donation-amounts .donation-amount input {
+  width: auto;
+}
+.donation_form .donation-amounts .donation-amount input:checked + label {
+  font-weight: bold;
+}
+.donation_form .donation-amounts .donation-amount label {
+  display: inline;
+  font-weight: normal;
+}

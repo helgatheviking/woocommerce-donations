@@ -1,0 +1,19 @@
+// WooCommerce Donations Styles
+.donation_form {
+    .donation-amounts {
+        list-style: none;
+        
+        .donation-amount {
+            input {
+                width: auto;
+                
+                &:checked+label { font-weight: bold; }
+            }
+            label {
+                display: inline;
+                font-weight: normal;
+            }
+
+        }
+    }
+}

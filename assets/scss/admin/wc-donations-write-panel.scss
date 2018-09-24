@@ -1,0 +1,59 @@
+// WooCommerce Donation Metabox Styles.
+
+#woocommerce-product-data ul.wc-tabs li.donation_options a:before { content: "\f511"; font-family: "Dashicons"; }
+
+.wc_donation_panel {
+	
+	// Messages.
+	.notice {
+	    margin: 10px;
+	}
+
+	// Navigation.
+	.controls {
+		float: right;
+		line-height: 24px;
+	}
+	
+	.expand-close {
+		
+		a {
+
+			&:before {
+				font-family: WooCommerce;
+				speak: none;
+				font-weight: 400;
+				font-variant: normal;
+				text-transform: none;
+				line-height: 1;
+				-webkit-font-smoothing: antialiased;
+				margin-right: .618em;
+				content: "";
+				text-decoration: none;
+				font-size: .8em;
+				color: #999;
+			}
+	
+			&.expand_all:before {
+				content:"\e035";
+			}
+	
+			&.close_all:before {
+				content:"\e036";
+			}
+			
+		}
+
+	}
+
+	// Input.
+	.add_donation_variation {
+		float: left;
+
+		#donation_amount {
+			width: 250px;
+			line-height: 2em;
+		}
+	}
+
+}

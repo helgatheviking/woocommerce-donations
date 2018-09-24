@@ -1,0 +1,39 @@
+#woocommerce-product-data ul.wc-tabs li.donation_options a:before {
+  content: "\f511";
+  font-family: "Dashicons";
+}
+
+.wc_donation_panel .notice {
+  margin: 10px;
+}
+.wc_donation_panel .controls {
+  float: right;
+  line-height: 24px;
+}
+.wc_donation_panel .expand-close a:before {
+  font-family: WooCommerce;
+  speak: none;
+  font-weight: 400;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  margin-right: .618em;
+  content: "";
+  text-decoration: none;
+  font-size: .8em;
+  color: #999;
+}
+.wc_donation_panel .expand-close a.expand_all:before {
+  content: "\e035";
+}
+.wc_donation_panel .expand-close a.close_all:before {
+  content: "\e036";
+}
+.wc_donation_panel .add_donation_variation {
+  float: left;
+}
+.wc_donation_panel .add_donation_variation #donation_amount {
+  width: 250px;
+  line-height: 2em;
+}
