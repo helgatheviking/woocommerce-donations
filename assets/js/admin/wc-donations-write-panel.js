@@ -36,6 +36,8 @@ jQuery( function( $ ) {
 		 */
 		variations_loaded: function( event, needsUpdate ) {
 			needsUpdate = needsUpdate || false;
+
+			var $product_data = $( '#woocommerce-product-data' );
 		
 			// Allow sorting
 			$( '.wc_donation_variations', this.donations_wrapper ).sortable({
@@ -50,6 +52,14 @@ jQuery( function( $ ) {
 				stop:                 function() {
 				    wc_meta_boxes_donation_variations_actions.variation_row_indexes();
 				}
+			});
+
+			// Init TipTip
+			$( '.wc_donation_variations .tips, .wc_donation_variations .help_tip, .wc_donation_variations .woocommerce-help-tip', $product_data ).tipTip({
+				'attribute': 'data-tip',
+				'fadeIn':    50,
+				'fadeOut':   50,
+				'delay':     200
 			});
 
 		},
