@@ -33,6 +33,10 @@ class WC_Donations_Admin_Ajax {
 		
 		// Ajax remove donation variations.
 		add_action( 'wp_ajax_woocommerce_remove_donation_variations', array( __CLASS__, 'remove_donation_variations' ) );
+
+		// Save donation variations.
+		add_action( 'wp_ajax_woocommerce_save_donation_variations', array( __CLASS__, 'save_donation_variations' ) );
+		
 	
 		
 	}
@@ -132,6 +136,40 @@ class WC_Donations_Admin_Ajax {
 		
 	}
 	
+		/**
+	 * Save variations via AJAX.
+	 */
+	public static function save_donation_variations() {
+		ob_start();
+
+		check_ajax_referer( 'save-donation-variations', 'security' );
+
+		// Check permissions again and make sure we have what we need
+		if ( ! current_user_can( 'edit_products' ) || empty( $_POST ) || empty( $_POST['product_id'] ) ) {
+			wp_die( -1 );
+		}
+
+		$product_id = absint( $_POST['product_id'] );
+		WC_Admin_Meta_Boxes::$meta_box_errors = array();
+		WC_Meta_Box_Product_Data::save_variations( $product_id, get_post( $product_id ) );
+
+		do_action( 'woocommerce_ajax_save_product_variations', $product_id );
+
+		if ( $errors = WC_Admin_Meta_Boxes::$meta_box_errors ) {
+			echo '<div class="error notice is-dismissible">';
+
+			foreach ( $errors as $error ) {
+				echo '<p>' . wp_kses_post( $error ) . '</p>';
+			}
+
+			echo '<button type="button" class="notice-dismiss"><span class="screen-reader-text">' . __( 'Dismiss this notice.', 'woocommerce' ) . '</span></button>';
+			echo '</div>';
+
+			delete_option( 'woocommerce_meta_box_errors' );
+		}
+
+		wp_die();
+	}
 	
 }
 

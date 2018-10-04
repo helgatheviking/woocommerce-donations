@@ -38,6 +38,15 @@ jQuery( function( $ ) {
 			needsUpdate = needsUpdate || false;
 
 			var $product_data = $( '#woocommerce-product-data' );
+
+			if ( ! needsUpdate ) {
+
+				// Remove variation-needs-update classes.
+				$( '.wc_donation_variations .variation-needs-update', $product_data ).removeClass( 'variation-needs-update' );
+
+				// Disable cancel and save buttons.
+				$( 'button.cancel-donation-variation-changes, button.save-donation-variation-changes', $product_data ).attr( 'disabled', 'disabled' );
+			}	
 		
 			// Allow sorting.
 			$( '.wc_donation_variations', $product_data ).sortable({
@@ -118,14 +127,34 @@ jQuery( function( $ ) {
 			
 			$( '#donation_product_data' )
 				.on( 'keypress', '#donation_amount', this.enter_amount )
-				.on( 'click', 'button.save-variation-changes', this.save_variations )
-				.on( 'click', 'button.cancel-variation-changes', this.cancel_variations )
+				.on( 'click', 'button.save-donation-variation-changes', this.save_variations )
+				.on( 'click', 'button.cancel-donation-variation-changes', this.cancel_variations )
 				.on( 'click', '.remove_variation', this.remove_variation );
 
 			$( document.body )
 				.on( 'change', '#donation_product_data .wc_donation_variations :input', this.input_changed );
 
 			$( 'form#post' ).on( 'submit', this.save_on_submit );
+		},
+
+		/**
+		 * Check if have some changes before leave the page
+		 *
+		 * @return {Bool}
+		 */
+		check_for_changes: function() {
+			var need_update = $( '#donation_product_data' ).find( '.wc_donation_variations .variation-needs-update' );
+
+			if ( 0 < need_update.length ) {
+				if ( window.confirm( woocommerce_admin_meta_boxes_variations.i18n_edited_variations ) ) {
+					wc_meta_boxes_donation_variations_ajax.save_changes();
+				} else {
+					need_update.removeClass( 'variation-needs-update' );
+					return false;
+				}
+			}
+
+			return true;
 		},
 
 		/**
@@ -192,6 +221,128 @@ jQuery( function( $ ) {
 		},
 
 		/**
+		 * Get variations fields and convert to object
+		 *
+		 * @param  {Object} fields
+		 *
+		 * @return {Object}
+		 */
+		get_variations_fields: function( fields ) {
+			var data = $( ':input', fields ).serializeJSON();
+
+			$( '.variations-defaults select' ).each( function( index, element ) {
+				var select = $( element );
+				data[ select.attr( 'name' ) ] = select.val();
+			});
+
+			return data;
+		},
+
+		/**
+		 * Save variations changes
+		 *
+		 * @param {Function} callback Called once saving is complete
+		 */
+		save_changes: function( callback ) {
+			var wrapper     = $( '#donation_product_data' ).find( '.wc_donation_variations' ),
+				need_update = $( '.variation-needs-update', wrapper ),
+				data        = {};
+
+			// Save only with products need update.
+			if ( 0 < need_update.length ) {
+				wc_meta_boxes_donation_variations_ajax.block();
+
+				data                 = wc_meta_boxes_donation_variations_ajax.get_variations_fields( need_update );
+				data.action          = 'woocommerce_save_donation_variations';
+				data.security        = WC_DONATIONS_ADMIN_META_BOX_VARIATIONS.save_variations_nonce;
+				data.product_id      = WC_DONATIONS_ADMIN_META_BOX_VARIATIONS.post_id;
+				data['product-type'] = $( '#product-type' ).val();
+
+				$.ajax({
+					url: WC_DONATIONS_ADMIN_META_BOX_VARIATIONS.ajax_url,
+					data: data,
+					type: 'POST',
+					success: function( response ) {
+						// Allow change page, delete and add new variations
+						need_update.removeClass( 'variation-needs-update' );
+						$( 'button.cancel-donation-variation-changes, button.save-donation-variation-changes' ).attr( 'disabled', 'disabled' );
+
+						$( '#woocommerce-product-data' ).trigger( 'wc_donation_variations_saved' );
+
+						if ( typeof callback === 'function' ) {
+							callback( response );
+						}
+
+						wc_meta_boxes_donation_variations_ajax.unblock();
+					}
+				});
+			}
+		},
+
+		/**
+		 * Save variations
+		 *
+		 * @return {Bool}
+		 */
+		save_variations: function() {
+			$( '#donation_product_data' ).trigger( 'wc_donation_variations_save_variations_button' );
+
+			wc_meta_boxes_donation_variations_ajax.save_changes( function( error ) {
+				var wrapper = $( '#donation_product_data' ).find( '.wc_donation_variations' ),
+					current = wrapper.attr( 'data-page' );
+
+				$( '#donation_product_data' ).find( '#woocommerce_errors' ).remove();
+
+				if ( error ) {
+					wrapper.before( error );
+				}
+
+				$( '.variations-defaults select' ).each( function() {
+					$( this ).attr( 'data-current', $( this ).val() );
+				});
+
+			});
+
+			return false;
+		},
+
+		/**
+		 * Save on post form submit
+		 */
+		save_on_submit: function( e ) {
+			var need_update = $( '#donation_product_data' ).find( '.wc_donation_variations .variation-needs-update' );
+
+			if ( 0 < need_update.length ) {
+				e.preventDefault();
+				$( '#donation_product_data' ).trigger( 'wc_donation_variations_save_variations_on_submit' );
+				wc_meta_boxes_donation_variations_ajax.save_changes( wc_meta_boxes_donation_variations_ajax.save_on_submit_done );
+			}
+		},
+
+		/**
+		 * After saved, continue with form submission
+		 */
+		save_on_submit_done: function() {
+			$( 'form#post' ).submit();
+		},
+
+		/**
+		 * Discart changes.
+		 *
+		 * @return {Bool}
+		 */
+		cancel_variations: function() {
+			var current = parseInt( $( '#donation_product_data' ).find( '.wc_donation_variations' ).attr( 'data-page' ), 10 );
+
+			$( '#donation_product_data' ).find( '.wc_donation_variations .variation-needs-update' ).removeClass( 'variation-needs-update' );
+			$( '.variations-defaults select' ).each( function() {
+				$( this ).val( $( this ).attr( 'data-current' ) );
+			});
+
+			return false;
+		},
+
+		/**
 		 * Add variation
 		 *
 		 * @return {Bool}
@@ -239,10 +390,10 @@ jQuery( function( $ ) {
 				type: 'POST',
 				success: function( response ) {
 					var variation = $( response );
-					//variation.addClass( 'variation-needs-update' );
+					variation.addClass( 'variation-needs-update' );
 	
 					$( '#donation_product_data' ).find( '.wc_donation_variations' ).append( variation );
-					$( 'button.cancel-variation-changes, button.save-variation-changes' ).removeAttr( 'disabled' );
+					$( 'button.cancel-donation-variation-changes, button.save-donation-variation-changes' ).removeAttr( 'disabled' );
 					$( '#donation_product_data' ).trigger( 'wc_donation_variation_added', 1 );
 		
 				},
@@ -260,7 +411,7 @@ jQuery( function( $ ) {
 		 * @return {Bool}
 		 */
 		remove_variation: function() {
-			//wc_meta_boxes_product_variations_ajax.check_for_changes();
+			wc_meta_boxes_donation_variations_ajax.check_for_changes();
 
 			if ( window.confirm( WC_DONATIONS_ADMIN_META_BOX_VARIATIONS.i18n_remove_variation ) ) {
 				var variation_id     = $( this ).attr( 'rel' ),
@@ -307,7 +458,7 @@ jQuery( function( $ ) {
 				.closest( '.wc_donation_variation' )
 				.addClass( 'variation-needs-update' );
 
-			$( 'button.cancel-variation-changes, button.save-variation-changes' ).removeAttr( 'disabled' );
+			$( 'button.cancel-donation-variation-changes, button.save-donation-variation-changes' ).removeAttr( 'disabled' );
 
 			$( '#donation_product_data' ).trigger( 'wc_donation_variations_input_changed' );
 		},

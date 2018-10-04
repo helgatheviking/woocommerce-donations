@@ -45,8 +45,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="wc_donation_variations wc-metaboxes" data-total-variations="<?php echo esc_attr( $donation_variations_count ); ?>" data-edited="false"></div>
 
 	<div class="toolbar hidden">
-		<button type="button" class="button-primary save-variation-changes" disabled="disabled"><?php esc_html_e( 'Save changes', 'wc-donations' ); ?></button>
-		<button type="button" class="button cancel-variation-changes" disabled="disabled"><?php esc_html_e( 'Cancel', 'wc-donations' ); ?></button>
+		<button type="button" class="button-primary save-donation-variation-changes" disabled="disabled"><?php esc_html_e( 'Save changes', 'wc-donations' ); ?></button>
+		<button type="button" class="button cancel-donation-variation-changes" disabled="disabled"><?php esc_html_e( 'Cancel', 'wc-donations' ); ?></button>
 
 		<div class="controls">
 			<span class="expand-close">
