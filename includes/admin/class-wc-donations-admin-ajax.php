@@ -106,6 +106,7 @@ class WC_Donations_Admin_Ajax {
 		$variation= new WC_Product_Variation();
 		$variation->set_parent_id( $product_id );
 		$variation->set_attributes( array( '_wcd_amount' => $amount ) );
+
 		$variation->set_regular_price( $amount );
 		$variation_id = $variation->save();
 
@@ -117,7 +118,7 @@ class WC_Donations_Admin_Ajax {
 	/**
 	 * Handles removing variations via ajax.
 	 */
-	public static function remove_donation_variations() { error_log('arrive at callback');
+	public static function remove_donation_variations() {
 
 		check_ajax_referer( 'delete-donation-variations', 'security' );
 
@@ -132,7 +133,7 @@ class WC_Donations_Admin_Ajax {
 			}
 		}
 
-		wp_die( -1 );
+		wp_die();
 		
 	}
 	

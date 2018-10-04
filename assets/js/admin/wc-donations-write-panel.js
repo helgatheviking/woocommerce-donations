@@ -22,11 +22,11 @@ jQuery( function( $ ) {
 			this.donations_wrapper = $( '#donation_product_data' ).find( '.wc_donation_variations' );
 
 			$( '#woocommerce-product-data' ).on( 'wc_donation_variations_loaded', this.variations_loaded );
-			$( document.body ).on( 'wc_donation_variation_added', this.variation_added );
-			$( document.body ).on( 'wc_donation_variation_removed', this.variation_removed );
+			$( document.body )
+				.on( 'wc_donation_variation_added', this.variation_added )
+				.on( 'wc_donation_variation_removed', this.variation_removed  );
 				
 		},
-		
 		
 		/**
 		 * Run actions when variations are loaded
@@ -63,7 +63,7 @@ jQuery( function( $ ) {
 				}
 			});
 
-			// Init TipTip
+			// Init TipTip.
 			$( '.wc_donation_variations .tips, .wc_donation_variations .help_tip, .wc_donation_variations .woocommerce-help-tip', $product_data ).tipTip({
 				'attribute': 'data-tip',
 				'fadeIn':    50,
@@ -79,13 +79,12 @@ jQuery( function( $ ) {
 		variation_added: function( event, success ) {
 			success = success || false;
 
-			var current_qty = this.donations_wrapper.data( 'total-variations' );
+			var current_qty = wc_meta_boxes_donation_variations_actions.donations_wrapper.data( 'total-variations' );
 
 			if( success ) {
-				this.donations_wrapper.data( 'total-variations', current_qty + 1 );
+				wc_meta_boxes_donation_variations_actions.donations_wrapper.data( 'total-variations', current_qty + 1 );
 			}
-			
-			// toggle toolbars.
+
 		},
 
 		/**
@@ -355,13 +354,13 @@ jQuery( function( $ ) {
         		var val = $(this).val();
 
 	            // Disable textbox to prevent multiple submit.
-	            $(this).attr('disabled', 'disabled');
+	            $(this).attr( 'disabled', 'disabled' );
 	
 	            // Do Stuff, submit, etc..
 				wc_meta_boxes_donation_variations_ajax.add_variation( val );
 				
 	            // Enable the textbox again if needed.
-	            $(this).removeAttr('disabled');
+	            $(this).removeAttr( 'disabled' ).val( '' );
 	         }
 	         
 		},
@@ -488,7 +487,6 @@ jQuery( function( $ ) {
 				toolbar          = $( '#donation_product_data' ).find( '.toolbar' ),
 				controls         = toolbar.find( $( '.controls' ) ),
 				message          = $( '#donation_product_data' ).find( '.notice.needs_donation_variation' );
-				
 
 			if( 0 === wrapper.find( '.wc_donation_variation' ).length ){
 				message.show();
@@ -501,9 +499,7 @@ jQuery( function( $ ) {
 			}
 		},
 		
-		
 	};
-	
 	
 	wc_meta_boxes_donation_variations_actions.init();
 	wc_meta_boxes_donation_variations_ajax.init();
