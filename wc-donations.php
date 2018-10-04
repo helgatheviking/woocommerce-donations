@@ -33,39 +33,82 @@ class WC_Donations {
 	const REQUIRED_WC = '3.4.0';
 
 	/**
+	 * The single instance of the class.
+	 *
+	 * @var WC_Donations
+	 */
+	protected static $_instance = null;
+
+	/**
 	 * Plugin Path
 	 *
-	 * @since 1.0.0
 	 * @var string $path
 	 */
-	public static $plugin_path = '';
+	private $plugin_path = '';
 
 	/**
 	 * Plugin URL
 	 *
-	 * @since 1.0.0
 	 * @var string $url
 	 */
-	public static $plugin_url = '';
+	private $plugin_url = '';
 
-	public static function init(){
 
-		// check we're running the required version of WC
-		if ( ! defined( 'WC_VERSION' ) || version_compare( WC_VERSION, self::REQUIRED_WC, '<' ) ) {
-			add_action( 'admin_notices', array( __CLASS__, 'admin_notice' ) );
-			return false;
+	/**
+	 * Main class Instance.
+	 *
+	 * Ensures only one instance of class is loaded or can be loaded.
+	 *
+	 * @static
+	 * @return WC_Donations - Main instance.
+	 */
+	public static function get_instance() {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
 		}
-
-		self::includes();
-		self::init_hooks();
-
+		return self::$_instance;
 	}
 
+	/**
+	 * Cloning is forbidden.
+	 */
+	public function __clone() {
+		_doing_it_wrong( __FUNCTION__, __( 'Cloning is forbidden.', 'wc-donations' ) );
+	}
+
+	/**
+	 * Unserializing instances of this class is forbidden.
+	 */
+	public function __wakeup() {
+		_doing_it_wrong( __FUNCTION__, __( 'Unserializing instances of this class is forbidden.', 'wc-donations' ) );
+	}
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct(){
+		$this->environment_check();
+		$this->includes();
+		$this->init_hooks();
+	}
 
 	/**
 	 * Include required core files used in admin and on the frontend.
 	 */
-	public static function includes() {
+	public function environment_check() {
+
+		// check we're running the required version of WC
+		if ( ! defined( 'WC_VERSION' ) || version_compare( WC_VERSION, self::REQUIRED_WC, '<' ) ) {
+			add_action( 'admin_notices', array( $this, 'admin_notice' ) );
+			return false;
+		}
+
+	}
+
+	/**
+	 * Include required core files used in admin and on the frontend.
+	 */
+	public function includes() {
 		/**
 		 * Class autoloader.
 		 */
@@ -74,8 +117,8 @@ class WC_Donations {
 		/*
 		 * Register our autoloader
 		 */
-		//spl_autoload_register( array( __CLASS__, 'autoloader' ) );
-		//
+		//spl_autoload_register( array( $this, 'autoloader' ) );
+		
 		// Data class.
 		require_once( 'includes/data/class-wc-donation-data.php' );
 
@@ -102,19 +145,17 @@ class WC_Donations {
 
 	/**
 	 * Hook into actions and filters.
-	 *
-	 * @since 2.3
 	 */
-	private static function init_hooks() {
+	private function init_hooks() {
 	
 		// Load translation files.
-		add_action( 'init', array( __CLASS__, 'load_plugin_textdomain' ) );
+		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 
 		// Include required files.
-		add_action( 'after_setup_theme', array( __CLASS__, 'template_includes' ) );
+		add_action( 'after_setup_theme', array( $this, 'template_includes' ) );
 
 		// Add donation product type.
-		add_filter( 'product_type_selector', array( __CLASS__, 'add_new_product_type' ) );
+		add_filter( 'product_type_selector', array( $this, 'add_new_product_type' ) );
 	}
 
 
@@ -128,7 +169,7 @@ class WC_Donations {
 	 * @return      void
 	 * @since       1.0.0
 	 */
-	public static function autoloader( $class_name ){
+	public function autoloader( $class_name ){
 		if ( class_exists( $class_name ) ) {
 			return;
 		}
@@ -151,9 +192,8 @@ class WC_Donations {
 	 * Include frontend functions and hooks
 	 *
 	 * @return void
-	 * @since  1.0
 	 */
-	public static function template_includes(){
+	public function template_includes(){
 		require_once( 'includes/wc-donations-template-functions.php' );
 		require_once( 'includes/wc-donations-template-hooks.php' );
 	}
@@ -162,9 +202,8 @@ class WC_Donations {
 	/**
 	 * Displays a warning message if version check fails.
 	 * @return string
-	 * @since  2.1
 	 */
-	public static function admin_notice() {
+	public function admin_notice() {
 		echo '<div class="error"><p>' . sprintf( __( 'WooCommerce Donations requires at least WooCommerce %s in order to function. Please upgrade WooCommerce.', 'wc-donations' ), self::REQUIRED_WC ) . '</p></div>';
 	}
 
@@ -178,9 +217,8 @@ class WC_Donations {
 	 * Make the plugin translation ready
 	 *
 	 * @return void
-	 * @since  1.0
 	 */
-	public static function load_plugin_textdomain() {
+	public function load_plugin_textdomain() {
 		load_plugin_textdomain( 'wc-donations' , false , dirname( plugin_basename( __FILE__ ) ) .  '/languages/' );
 	}
 
@@ -196,7 +234,7 @@ class WC_Donations {
 	 * @return array Array of Product types & their labels, including the Subscription product type.
 	 * @since 1.0
 	 */
-	public static function add_new_product_type( $product_types ) {
+	public function add_new_product_type( $product_types ) {
 		$product_types['donation']          = __( 'Donation', 'wc-donations' );
 		return $product_types;
 	}
@@ -208,26 +246,37 @@ class WC_Donations {
 	/**
 	 * Get plugin path
 	 */
-	public static function get_plugin_path() {
-		if( self::$plugin_path == '' ) {
-			self::$plugin_path = untrailingslashit( plugin_dir_path(__FILE__) );
+	public function get_plugin_path() {
+		if( $this->plugin_path == '' ) {
+			$this->plugin_path = untrailingslashit( plugin_dir_path(__FILE__) );
 		}
-		return self::$plugin_path;
+		return $this->plugin_path;
 	}
 
 	/**
 	 * Get plugin URL
 	 */
-	public static function get_plugin_url() {
-		if( self::$plugin_url == '' ) {
-			self::$plugin_url = untrailingslashit( plugin_dir_url(__FILE__) );
+	public function get_plugin_url() {
+		if( $this->plugin_url == '' ) {
+			$this->plugin_url = untrailingslashit( plugin_dir_url(__FILE__) );
 		}
-		return self::$plugin_url;
+		return $this->plugin_url;
 	}
 
 } //end class: do not remove or there will be no more guacamole for you
 
 endif; // end class_exists check
 
-// Launch the whole plugin
-add_action( 'woocommerce_loaded', 'WC_Donations::init' );
+/**
+ * Main instance of WooCommerce Donations.
+ *
+ * Returns the main instance of to prevent the need to use globals.
+ *
+ * @return WC_Donations
+ */
+function WC_Donations() {
+	return WC_Donations::get_instance();
+}
+
+// Launch the whole plugin.
+add_action( 'woocommerce_loaded', 'WC_Donations' );

@@ -110,7 +110,7 @@ class WC_Donations_Admin {
 
 			$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
-			wp_enqueue_script( 'wc-donations-writepanel', WC_Donations::get_plugin_url() . '/assets/js/admin/wc-donations-write-panel' . $suffix . '.js', array( 'jquery', 'wc-enhanced-select' ), time() );
+			wp_enqueue_script( 'wc-donations-writepanel', WC_Donations()->get_plugin_url() . '/assets/js/admin/wc-donations-write-panel' . $suffix . '.js', array( 'jquery', 'wc-enhanced-select' ), time() );
 
 
 			$params = array(
@@ -129,7 +129,7 @@ class WC_Donations_Admin {
 			
 			
 			// Metabox styles.
-			wp_enqueue_style( 'wc_donations_admin', WC_Donations::get_plugin_url() . '/assets/css/admin/wc-donations-write-panel.css', array(), time() );
+			wp_enqueue_style( 'wc_donations_admin', WC_Donations()->get_plugin_url() . '/assets/css/admin/wc-donations-write-panel.css', array(), time() );
 			
 			add_action( 'admin_head', array( __CLASS__, 'admin_header' ) );
 

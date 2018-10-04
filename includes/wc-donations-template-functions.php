@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Front-end styles.
  */
 function wc_donations_front_end_styles(){
-	wp_register_style( 'wc-donations-style', WC_Donations::get_plugin_url() . '/assets/css/frontend/wc-donations-frontend.css', false, time() );
+	wp_register_style( 'wc-donations-style', WC_Donations()->get_plugin_url() . '/assets/css/frontend/wc-donations-frontend.css', false, time() );
 	//wp_style_add_data( 'wc-donations-style', 'rtl', 'replace' );
 
 	wp_enqueue_style( 'wc-donations-style' );
@@ -48,7 +48,7 @@ function wc_donation_template_add_to_cart() {
 			'product'           => $product,
 			'product_id'        => $product->get_id(),
 			'classes'           => implode( ' ', $form_classes )
-		), false, WC_Donations::get_plugin_path() . '/templates/' );
+		), false, WC_Donations()->get_plugin_path() . '/templates/' );
 	}
 }
 
@@ -77,7 +77,7 @@ function wc_donations_template_variations_wrapper_open( $product ) {
 				'classes'	  => $classes
 			),
 			'',
-			WC_Donations::get_plugin_path() . '/templates/'
+			WC_Donations()->get_plugin_path() . '/templates/'
 		);
 
 	}
@@ -97,7 +97,7 @@ function wc_donations_template_variations_chose( $product ) {
 			'single-product/donation/donation-variations-choose.php',
 			array(),
 			'',
-			WC_Donations::get_plugin_path() . '/templates/'
+			WC_Donations()->get_plugin_path() . '/templates/'
 		);
 
 	}
@@ -119,7 +119,7 @@ function wc_donations_template_donation_variation( $variation, $product ) {
 			'variation'	=> $variation
 		),
 		'',
-		WC_Donations::get_plugin_path() . '/templates/'
+		WC_Donations()->get_plugin_path() . '/templates/'
 	);
 
 }
@@ -137,7 +137,7 @@ function wc_donations_template_variations_wrapper_close( $product ) {
 			'single-product/donation/donation-variations-wrapper-close.php',
 			array(),
 			'',
-			WC_Donations::get_plugin_path() . '/templates/'
+			WC_Donations()->get_plugin_path() . '/templates/'
 		);
 
 	}

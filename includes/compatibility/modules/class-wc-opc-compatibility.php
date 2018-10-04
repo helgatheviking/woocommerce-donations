@@ -56,7 +56,7 @@ class WC_MNM_OPC_Compatibility {
 					'mnm_products'       => $product->get_available_children()
 				),
 				'',
-				WC_Donations::get_plugin_path() . '/templates/'
+				WC_Donations()->get_plugin_path() . '/templates/'
 			);
 
 			echo str_replace( array( '<form method="post" enctype="multipart/form-data"', '</form>' ), array( '<div', '</div>' ), ob_get_clean() );
