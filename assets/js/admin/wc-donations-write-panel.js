@@ -39,8 +39,8 @@ jQuery( function( $ ) {
 
 			var $product_data = $( '#woocommerce-product-data' );
 		
-			// Allow sorting
-			$( '.wc_donation_variations', this.donations_wrapper ).sortable({
+			// Allow sorting.
+			$( '.wc_donation_variations', $product_data ).sortable({
 				items:                '.wc_donation_variation',
 				cursor:               'move',
 				axis:                 'y',
@@ -97,11 +97,9 @@ jQuery( function( $ ) {
 		/**
 		 * Set menu order
 		 */
-		variation_row_indexes: function() {
-			var wrapper      = $( '#variable_product_options' ).find( '.wc_donation_variations' );
-			
-			$( '.woocommerce_variations .wc_donation_variation' ).each( function ( index, el ) {
-				$( '.variation_menu_order', el ).val( parseInt( $( el ).index( '.wc_donation_variations .wc_donation_variation' ), 10 ) + 1 ).change();
+		variation_row_indexes: function() {		
+			$( '.wc_donation_variations .wc_donation_variation' ).each( function ( index, el ) {
+				$( '.variation_menu_order', el ).val( parseInt( $( el ).index( '.wc_donation_variations .wc_donation_variation' ), 10 ) ).change();
 			});
 		}
 		
