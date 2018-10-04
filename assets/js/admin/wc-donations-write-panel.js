@@ -91,7 +91,7 @@ jQuery( function( $ ) {
 		/**
 		 * Run actions when a variation is removed
 		 */
-		variation_added: function( event, success ) {
+		variation_removed: function( event, success ) {
 			success = success || false;
 
 			var current_qty = this.donations_wrapper.data( 'total-variations' );
@@ -99,8 +99,7 @@ jQuery( function( $ ) {
 			if( success ) {
 				this.donations_wrapper.data( 'total-variations', current_qty - 1 );
 			}
-			
-			// toggle toolbars.
+
 		},
 
 		/**
@@ -474,7 +473,9 @@ jQuery( function( $ ) {
 		 */
 		init: function() {
 			$( document.body )
-				.on( 'wc_donation_variations_loaded', this.toggle_toolbars );
+				.on( 'wc_donation_variations_loaded', this.toggle_toolbars )
+				.on( 'wc_donation_variation_added', this.toggle_toolbars )
+				.on( 'wc_donation_variation_removed', this.toggle_toolbars );
 		},
 		
 		/**
