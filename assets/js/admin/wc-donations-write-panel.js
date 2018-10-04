@@ -106,7 +106,7 @@ jQuery( function( $ ) {
 		 */
 		variation_row_indexes: function() {		
 			$( '.wc_donation_variations .wc_donation_variation' ).each( function ( index, el ) {
-				$( '.variation_menu_order', el ).val( parseInt( $( el ).index( '.wc_donation_variations .wc_donation_variation' ), 10 ) ).change();
+				$( '.donation_variation_menu_order', el ).val( parseInt( $( el ).index( '.wc_donation_variations .wc_donation_variation' ), 10 ) ).change();
 			});
 		}
 		

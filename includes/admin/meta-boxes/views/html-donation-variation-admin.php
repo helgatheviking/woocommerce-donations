@@ -15,8 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="tips sort" data-tip="<?php esc_attr_e( 'Drag and drop', 'wc-donations' ); ?>"></div>
 		<strong><?php echo wc_price( $variation->get_regular_price( 'edit' ) )?></strong> 
 		
-		<input type="hidden" name="variable_post_id[<?php echo esc_attr( $loop ); ?>]" value="<?php echo esc_attr( $variation->get_id() ); ?>" />
-		<input type="hidden" class="variation_menu_order" name="variation_menu_order[<?php echo esc_attr( $loop ); ?>]" value="<?php echo esc_attr( $variation->get_menu_order( 'edit' ) ); ?>" />
+		<input type="hidden" name="donation_post_id[<?php echo esc_attr( $loop ); ?>]" value="<?php echo esc_attr( $variation->get_id() ); ?>" />
+		<input type="hidden" class="variation_menu_order donation_variation_menu_order" name="donation_variation_menu_order[<?php echo esc_attr( $loop ); ?>]" value="<?php echo esc_attr( $variation->get_menu_order( 'edit' ) ); ?>" />
 	</h3>
 	<div class="woocommerce_variable_attributes wc-metabox-content" style="display: none;">
 		<div class="data">

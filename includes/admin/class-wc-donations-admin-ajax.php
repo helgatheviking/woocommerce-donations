@@ -152,7 +152,7 @@ class WC_Donations_Admin_Ajax {
 
 		$product_id = absint( $_POST['product_id'] );
 		WC_Admin_Meta_Boxes::$meta_box_errors = array();
-		WC_Meta_Box_Product_Data::save_variations( $product_id, get_post( $product_id ) );
+		WC_Donations_Admin_Meta_Boxes::save_donation_variations( $product_id, get_post( $product_id ) );
 
 		do_action( 'woocommerce_ajax_save_product_variations', $product_id );
 

@@ -155,55 +155,56 @@ class WC_Donations_Admin_Meta_Boxes {
 					$props[ 'add_to_cart_form_location' ] = $form_location;
 				}
 			}
-define('WC_DONATIONS_UPDATING', true );
-			if ( ! defined( 'WC_DONATIONS_UPDATING' ) ) {
 
-				// Initialize the child content.
-				$wc_donation_contents_data = array();
 
-				// Populate with product data.
-				if ( isset( $_POST[ 'wc_donation_allowed_contents' ] ) && ! empty( $_POST[ 'wc_donation_allowed_contents' ] ) ) {
-
-					$wc_donation_allowed_contents = array_filter( array_map( 'intval', (array) $_POST[ 'wc_donation_allowed_contents' ] ) );
-
-					$unsupported_error = false;
-
-					// Check product types of selected items.
-					foreach ( $wc_donation_allowed_contents as $wc_donation_id ) {
-
-						$wc_donation_product = wc_get_product( $wc_donation_id );
-
-						if ( ! in_array( $wc_donation_product->get_type(), WC_Donations_Helpers::get_supported_product_types() ) || ( $wc_donation_product->is_type( 'variation' ) && ! WC_Donations_Core_Compatibility::has_all_attributes_set( $wc_donation_product ) ) ) {
-							$unsupported_error = true;
-						} else {
-							// Product-specific data, such as discounts, or min/max quantities in container may be included later on.
-							$wc_donation_contents_data[ $wc_donation_id ][ 'product_id' ] = $wc_donation_product->get_id();
-						}
-					}
-
-					if ( $unsupported_error ) {
-						WC_Admin_Meta_Boxes::add_error( __( 'Mix & Match supports simple products and product variations with all attributes defined. Other product types and partially-defined variations cannot be added to the Mix & Match container.', 'wc-donations' ) );
-					}
-				}
-
-				// Show a notice if the user hasn't selected any items for the container.
-				if ( empty( $wc_donation_contents_data ) ) {
-					WC_Admin_Meta_Boxes::add_error( __( 'Please select at least one product to use for this Mix & Match product.', 'wc-donations' ) );
-				} else {
-					$props['contents'] = $wc_donation_contents_data;
-				}
-
-				// Finally, set the properties for saving.
-				$product->set_props( $props );
-
-			} else {
-				WC_Admin_Meta_Boxes::add_error( __( 'Your changes have not been saved &ndash; please wait for the <strong>WooCommerce Donations Data Update</strong> routine to complete before creating new Mix and Match products or making changes to existing ones.', 'wc-donations' ) );
-			}
+			$product->get_data_store()->sync_variation_names( $product, wc_clean( $_POST['original_post_title'] ), wc_clean( $_POST['post_title'] ) );
 
 			do_action( 'woocommerce_admin_process_donation_product_object', $product );
 
 		}
 	}
+
+	/**
+	 * Save meta box data.
+	 *
+	 * @param int     $post_id
+	 * @param WP_Post $post
+	 */
+	public static function save_donation_variations( $post_id, $post ) {
+		if ( isset( $_POST['donation_post_id'] ) ) {
+			$parent = wc_get_product( $post_id );
+
+			$max_loop   = max( array_keys( $_POST['donation_post_id'] ) );
+			$data_store = $parent->get_data_store();
+			$data_store->sort_all_product_variations( $parent->get_id() );
+
+			for ( $i = 0; $i <= $max_loop; $i ++ ) {
+
+				if ( ! isset( $_POST['donation_post_id'][ $i ] ) ) {
+					continue;
+				}
+				$variation_id = absint( $_POST['donation_post_id'][ $i ] );
+				$variation    = new WC_Product_Variation( $variation_id );
+				$stock        = null;
+
+				$errors = $variation->set_props(
+					array(
+						'status'            => 'publish',
+						'menu_order'        => wc_clean( $_POST['variation_menu_order'][ $i ] ),
+						'regular_price'     => wc_clean( $_POST['variable_regular_price'][ $i ] )
+					)
+				);
+
+				if ( is_wp_error( $errors ) ) {
+					WC_Admin_Meta_Boxes::add_error( $errors->get_error_message() );
+				}
+
+				$variation->save();
+
+				do_action( 'woocommerce_save_donation_variation', $variation_id, $i );
+			}
+		}
+
 }
 
 // Launch the admin class.
